@@ -43,7 +43,7 @@ SubOS helps you track recurring subscriptions, manage budgets, and optimize spen
 
 1. **Clone the repository**
 ```bash
-git clone <repository-url>
+git clone https://github.com/aref-vc/SubOS.git
 cd SubOS
 ```
 
