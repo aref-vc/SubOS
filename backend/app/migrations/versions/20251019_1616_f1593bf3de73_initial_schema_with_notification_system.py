@@ -1,8 +1,8 @@
-"""Initial schema
+"""Initial schema with notification system
 
-Revision ID: 87cf69dc0436
+Revision ID: f1593bf3de73
 Revises: 
-Create Date: 2025-10-19 15:56:21.746157
+Create Date: 2025-10-19 16:16:36.978974
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '87cf69dc0436'
+revision: str = 'f1593bf3de73'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -88,12 +88,13 @@ def upgrade() -> None:
     op.create_table('email_notifications',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('user_id', sa.Integer(), nullable=False),
-    sa.Column('smtp_host', sa.String(length=255), nullable=False),
+    sa.Column('smtp_address', sa.String(length=255), nullable=False),
     sa.Column('smtp_port', sa.Integer(), nullable=False),
-    sa.Column('smtp_username', sa.String(length=255), nullable=False),
-    sa.Column('smtp_password', sa.String(length=255), nullable=False),
+    sa.Column('smtp_username', sa.String(length=255), nullable=True),
+    sa.Column('smtp_password', sa.String(length=255), nullable=True),
     sa.Column('from_email', sa.String(length=255), nullable=False),
-    sa.Column('use_tls', sa.Boolean(), nullable=True),
+    sa.Column('to_email', sa.String(length=255), nullable=False),
+    sa.Column('encryption', sa.String(length=20), nullable=True),
     sa.Column('created_at', sa.TIMESTAMP(), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=True),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
@@ -131,6 +132,10 @@ def upgrade() -> None:
     sa.Column('discord_enabled', sa.Boolean(), nullable=True),
     sa.Column('telegram_enabled', sa.Boolean(), nullable=True),
     sa.Column('pushover_enabled', sa.Boolean(), nullable=True),
+    sa.Column('pushplus_enabled', sa.Boolean(), nullable=True),
+    sa.Column('mattermost_enabled', sa.Boolean(), nullable=True),
+    sa.Column('ntfy_enabled', sa.Boolean(), nullable=True),
+    sa.Column('gotify_enabled', sa.Boolean(), nullable=True),
     sa.Column('webhook_enabled', sa.Boolean(), nullable=True),
     sa.Column('created_at', sa.TIMESTAMP(), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=True),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], ondelete='CASCADE'),
@@ -152,6 +157,8 @@ def upgrade() -> None:
     sa.Column('user_id', sa.Integer(), nullable=False),
     sa.Column('user_key', sa.String(length=255), nullable=False),
     sa.Column('api_token', sa.String(length=255), nullable=False),
+    sa.Column('priority', sa.Integer(), nullable=True),
+    sa.Column('sound', sa.String(length=50), nullable=True),
     sa.Column('created_at', sa.TIMESTAMP(), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=True),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')

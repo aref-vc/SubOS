@@ -8,6 +8,9 @@ from flask_sqlalchemy import SQLAlchemy
 # Initialize SQLAlchemy
 db = SQLAlchemy()
 
+# Initialize Notification Scheduler (will be set up after app creation)
+notification_scheduler = None
+
 
 def create_app(config_name='default'):
     """
@@ -34,6 +37,12 @@ def create_app(config_name='default'):
     CORS(app,
          supports_credentials=True,
          origins=app.config['CORS_ORIGINS'])
+
+    # Initialize notification scheduler (only in production/development, not testing)
+    if config_name != 'testing':
+        from app.services.notification_scheduler import NotificationScheduler
+        global notification_scheduler
+        notification_scheduler = NotificationScheduler(app)
 
     # Register blueprints
     from app.api.v1 import api_v1

@@ -23,6 +23,10 @@ class NotificationSettings(Base):
     discord_enabled = Column(Boolean, default=False)
     telegram_enabled = Column(Boolean, default=False)
     pushover_enabled = Column(Boolean, default=False)
+    pushplus_enabled = Column(Boolean, default=False)
+    mattermost_enabled = Column(Boolean, default=False)
+    ntfy_enabled = Column(Boolean, default=False)
+    gotify_enabled = Column(Boolean, default=False)
     webhook_enabled = Column(Boolean, default=False)
 
     # Timestamps
@@ -36,6 +40,10 @@ class NotificationSettings(Base):
             'discord_enabled': self.discord_enabled,
             'telegram_enabled': self.telegram_enabled,
             'pushover_enabled': self.pushover_enabled,
+            'pushplus_enabled': self.pushplus_enabled,
+            'mattermost_enabled': self.mattermost_enabled,
+            'ntfy_enabled': self.ntfy_enabled,
+            'gotify_enabled': self.gotify_enabled,
             'webhook_enabled': self.webhook_enabled
         }
 
@@ -48,14 +56,27 @@ class EmailNotification(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(Integer, ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
 
-    smtp_host = Column(String(255), nullable=False)
+    smtp_address = Column(String(255), nullable=False)  # SMTP server address
     smtp_port = Column(Integer, nullable=False, default=587)
-    smtp_username = Column(String(255), nullable=False)
-    smtp_password = Column(String(255), nullable=False)  # Should be encrypted
+    smtp_username = Column(String(255))
+    smtp_password = Column(String(255))  # Should be encrypted
     from_email = Column(String(255), nullable=False)
-    use_tls = Column(Boolean, default=True)
+    to_email = Column(String(255), nullable=False)  # Recipient email
+    encryption = Column(String(20), default='tls')  # tls, ssl, or none
 
     created_at = Column(TIMESTAMP, server_default=func.now())
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'smtp_address': self.smtp_address,
+            'smtp_port': self.smtp_port,
+            'smtp_username': self.smtp_username,
+            'from_email': self.from_email,
+            'to_email': self.to_email,
+            'encryption': self.encryption
+        }
 
 
 class DiscordNotification(Base):
@@ -69,6 +90,13 @@ class DiscordNotification(Base):
     webhook_url = Column(String(500), nullable=False)
 
     created_at = Column(TIMESTAMP, server_default=func.now())
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'webhook_url': self.webhook_url
+        }
 
 
 class TelegramNotification(Base):
@@ -84,6 +112,14 @@ class TelegramNotification(Base):
 
     created_at = Column(TIMESTAMP, server_default=func.now())
 
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'bot_token': self.bot_token,
+            'chat_id': self.chat_id
+        }
+
 
 class PushoverNotification(Base):
     """Pushover notification configuration"""
@@ -95,8 +131,20 @@ class PushoverNotification(Base):
 
     user_key = Column(String(255), nullable=False)
     api_token = Column(String(255), nullable=False)
+    priority = Column(Integer, default=0)  # -2 to 2
+    sound = Column(String(50), default='pushover')  # pushover, bike, bugle, etc.
 
     created_at = Column(TIMESTAMP, server_default=func.now())
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'user_key': self.user_key,
+            'api_token': self.api_token,
+            'priority': self.priority,
+            'sound': self.sound
+        }
 
 
 class WebhookNotification(Base):
